@@ -6,15 +6,15 @@ import (
 )
 
 // return html hasil scraping
-func Scraper(url string) (string, int, error) {
+func Scraper(url string) ([]byte, int, error) {
 	response, err := http.Get(url)
 	if err != nil {
 		// handle error
-		return "", response.StatusCode, err
+		return nil, response.StatusCode, err
 	}
 
 	defer response.Body.Close()
 
 	bytes, _ := io.ReadAll(response.Body)
-	return string(bytes), response.StatusCode, nil
+	return bytes, response.StatusCode, nil
 }
