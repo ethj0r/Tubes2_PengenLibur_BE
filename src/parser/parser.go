@@ -77,13 +77,17 @@ func Parse(src []byte) (*algorithm.Node, error) {
 				currentParent.AddChild(TokenToNode(&token))
 			}
 		case net_html.StartTagToken:
+			// kasus khusus kalo <meta> ni somehow di-classify jadi start :/
+
 			// buat node
 			currentNode = TokenToNode(&token)
 			if currentParent != nil {
 				currentParent.AddChild(currentNode)
 			}
 			// pindah ke dalam bagian si child yang baru
-			currentParent = currentNode
+			if token.Data != "meta" {
+				currentParent = currentNode
+			}
 		case net_html.EndTagToken:
 			// balik naik ke atas
 			if currentParent != nil && currentParent.Parent != nil {
