@@ -12,9 +12,9 @@ type Attribute struct {
 }
 
 type Element struct {
-	TagName     string
-	TextContent string
-	Attributes  []Attribute
+	Data       string
+	IsText     bool
+	Attributes []Attribute
 }
 
 type Node struct {
@@ -34,6 +34,9 @@ func NewNode(element Element) *Node {
 
 // Adding new child
 func (node *Node) AddChild(childNode *Node) {
+	if node == nil {
+		return
+	}
 	childNode.Parent = node // set Parent to current node
 	node.Children = append(node.Children, childNode)
 }
@@ -67,7 +70,7 @@ func (root *Node) PrintTree(depth int) {
 		fmt.Print(" ")
 
 	}
-	fmt.Printf("Current Depth: %d, Current Tag: %s, Current Text: %s \n", depth, root.Elmt.TagName, root.Elmt.TextContent)
+	fmt.Printf("Current Depth: %d, Data: %s \n", depth, root.Elmt.Data)
 	for i := 0; i < len(root.Elmt.Attributes); i++ {
 		for i := 0; i < depth; i++ {
 			fmt.Print(" ")
@@ -125,63 +128,63 @@ func BuildDomTreeExampleHardcoded() *Node {
 	}
 
 	htmlElement := Element{
-		TagName:     "html",
-		TextContent: "",
-		Attributes:  nil,
+		Data:       "html",
+		IsText:     false,
+		Attributes: nil,
 	}
 
 	headElement := Element{
-		TagName:     "head",
-		TextContent: "",
-		Attributes:  nil,
+		Data:       "head",
+		IsText:     false,
+		Attributes: nil,
 	}
 
 	titleElement := Element{
-		TagName:     "title",
-		TextContent: "",
-		Attributes:  nil,
+		Data:       "title",
+		IsText:     false,
+		Attributes: nil,
 	}
 
 	textInsideTitle := Element{
-		TagName:     "",
-		TextContent: "Hello",
-		Attributes:  nil,
+		Data:       "Hello",
+		IsText:     true,
+		Attributes: nil,
 	}
 
 	bodyElement := Element{
-		TagName:     "body",
-		TextContent: "",
-		Attributes:  []Attribute{kelas1Attribute},
+		Data:       "body",
+		IsText:     false,
+		Attributes: []Attribute{kelas1Attribute},
 	}
 
 	textInsideBody := Element{
-		TagName:     "",
-		TextContent: "Hi ges !",
-		Attributes:  nil,
+		Data:       "Hi ges !",
+		IsText:     true,
+		Attributes: nil,
 	}
 
 	h1Element := Element{
-		TagName:     "h1",
-		TextContent: "",
-		Attributes:  []Attribute{kelas2Attribute, kelas3Attribute},
+		Data:       "h1",
+		IsText:     false,
+		Attributes: []Attribute{kelas2Attribute, kelas3Attribute},
 	}
 
 	textInsideh1 := Element{
-		TagName:     "",
-		TextContent: "Hello, World!",
-		Attributes:  nil,
+		IsText:     true,
+		Data:       "Hello, World!",
+		Attributes: nil,
 	}
 
 	pElement := Element{
-		TagName:     "p",
-		TextContent: "",
-		Attributes:  []Attribute{kelas4Attribute, idUnikAttribute},
+		Data:       "p",
+		IsText:     false,
+		Attributes: []Attribute{kelas4Attribute, idUnikAttribute},
 	}
 
 	textInsideP := Element{
-		TagName:     "",
-		TextContent: "Aku ganteng!",
-		Attributes:  nil,
+		IsText:     true,
+		Data:       "Aku ganteng!",
+		Attributes: nil,
 	}
 
 	h1TextNode := NewNode(textInsideh1)
