@@ -1,8 +1,8 @@
 package main
 
 import (
-	"backend/src/parser"
-	"backend/src/scraper"
+	"backend/internal/algorithm"
+	"backend/internal/scraper"
 	"fmt"
 )
 
@@ -15,7 +15,7 @@ func main() {
 		fmt.Print(string(src))
 		return
 	}
-	root, err := parser.Parse(src)
+	root, err := algorithm.Parse(src)
 	if err != nil {
 		fmt.Print("Error!\n")
 	}
