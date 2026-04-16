@@ -48,3 +48,26 @@ func (node *Node) isMatch(selector string) bool {
 
 	return false
 }
+
+// mengecek apakah node dapat ditelusuri lagi (bukan nil / text node)
+func (node *Node) isSearchableNode() bool {
+	if node == nil {
+		return false
+	}
+
+	if node.Elmt.IsText {
+		return false
+	}
+
+	return true
+}
+
+// filter untuk include node ke result (gabungan 2 func sebelumnya)
+func (node *Node) includeNode(selector string) bool {
+	return node.isSearchableNode() && node.isMatch(selector)
+}
+
+// mengecek apakah ada child atau tidak
+func (node *Node) hasChildren() bool {
+	return node != nil && len(node.Children) > 0
+}
