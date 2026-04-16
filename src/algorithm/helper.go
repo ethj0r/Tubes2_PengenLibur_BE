@@ -2,26 +2,37 @@
 
 import "strings"
 
-// mengecek apakah node sesuai dengan selector yang diinginkan
+// mengecek apakah node sesuai selector (tag, .class, #id, *)
 func (node *Node) isMatch(selector string) bool {
-	// node / selector kosong
-	if node == nil || selector == "" {
+	// empty node
+	if node == nil {
 		return false
 	}
 
-	// tag selector (no prefix)
+	// empty selector
+	selector = strings.TrimSpace(selector)
+	if selector == "" {
+		return false
+	}
+
+	// universal
+	if selector == "*" {
+		return true
+	}
+
+	// tag selector (tanpa prefix)
 	if selector[0] != '.' && selector[0] != '#' {
 		return node.Elmt.Data == selector
 	}
 
-	// class dan id selector
+	// class & id selector
 	for _, atr := range node.Elmt.Attributes {
-		// class selector (bisa ada spasi, misal "p1 p2 p3")
+		// class selector (bisa multi-class, misal "a b c")
 		if atr.Name == "class" && selector[0] == '.' {
-			classes := strings.Split(atr.Value, " ") // split spasi
+			classes := strings.Fields(atr.Value)
 
 			for _, cls := range classes {
-				if "." + strings.TrimSpace(cls) == selector { // remove spasi yang masuk
+				if "." + cls == selector {
 					return true
 				}
 			}
