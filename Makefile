@@ -1,10 +1,10 @@
 .PHONY: run build test tidy
 
 run:
-	go run ./cmd/server
+	go run ./cmd/api
 
 build:
-	go build -o bin/server ./cmd/server
+	go build -o bin/api ./cmd/api
 
 test:
 	go test ./...
