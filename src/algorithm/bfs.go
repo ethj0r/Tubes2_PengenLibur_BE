@@ -16,16 +16,16 @@ func (node *Node) bfsSearch(selector string) []*Node {
 		curr := queue[0]
 		queue = queue[1:]
 
-		if curr == nil { 
+		if curr == nil {
 			continue
 		}
 
 		// insert node ke hasil sesuai filter
-		if curr.includeNode(selector) {
+		if includeNode(curr, selector) {
 			result = append(result, curr)
 		}
 
-		if curr.hasChildren() {
+		if hasChildren(curr) {
 			// insert child ke belakang queue (proses level by level)
 			for _, child := range curr.Children {
 				if child != nil {

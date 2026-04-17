@@ -3,7 +3,7 @@
 import "strings"
 
 // mengecek apakah node sesuai selector (tag, .class, #id, *)
-func (node *Node) isMatch(selector string) bool {
+func isMatch(node *Node, selector string) bool {
 	// empty node
 	if node == nil {
 		return false
@@ -50,7 +50,7 @@ func (node *Node) isMatch(selector string) bool {
 }
 
 // mengecek apakah node dapat ditelusuri lagi (bukan nil / text node)
-func (node *Node) isSearchableNode() bool {
+func isSearchableNode(node *Node) bool {
 	if node == nil {
 		return false
 	}
@@ -63,22 +63,22 @@ func (node *Node) isSearchableNode() bool {
 }
 
 // filter untuk include node ke result (gabungan 2 func sebelumnya)
-func (node *Node) includeNode(selector string) bool {
-	return node.isSearchableNode() && node.isMatch(selector)
+func includeNode(node *Node, selector string) bool {
+	return isSearchableNode(node) && isMatch(node, selector)
 }
 
 // mengecek apakah ada child atau tidak
-func (node *Node) hasChildren() bool {
+func hasChildren(node *Node) bool {
 	return node != nil && len(node.Children) > 0
 }
 
 // mengecek apakah node adalah child langsung dari parent (parent > child)
-func (node *Node) isDirectChildOf(parent *Node) bool {
+func isDirectChildOf(node *Node, parent *Node) bool {
 	return node != nil && parent != nil && node.Parent == parent
 }
 
 // mengecek apakah node turunan dari ancestor (ancestor descendant)
-func (node *Node) isDescendantOf(ancestor *Node) bool {
+func isDescendantOf(node *Node, ancestor *Node) bool {
 	if node == nil || ancestor == nil {
 		return false
 	}
@@ -94,7 +94,7 @@ func (node *Node) isDescendantOf(ancestor *Node) bool {
 }
 
 // mengecek apakah node sibling tepat setelah sibling lain (sibling1 + sibling2)
-func (node *Node) isAdjacentSiblingOf(sibling *Node) bool {
+func isAdjacentSiblingOf(node *Node, sibling *Node) bool {
 	if node == nil || sibling == nil || node.Parent == nil || node.Parent != sibling.Parent {
 		return false
 	}
@@ -111,7 +111,7 @@ func (node *Node) isAdjacentSiblingOf(sibling *Node) bool {
 }
 
 // mengecek apakah node adalah sibling setelah sibling lain (sibling1 ~ sibling2)
-func (node *Node) isGeneralSiblingOf(sibling *Node) bool {
+func isGeneralSiblingOf(node *Node, sibling *Node) bool {
 	if node == nil || sibling == nil || node.Parent == nil || node.Parent != sibling.Parent {
 		return false
 	}
@@ -131,6 +131,6 @@ func (node *Node) isGeneralSiblingOf(sibling *Node) bool {
 		}
 	}
 
-	// sibling harus sebelum node 
+	// sibling harus sebelum node
 	return idxNode > idxSibling && idxSibling >= 0
 }

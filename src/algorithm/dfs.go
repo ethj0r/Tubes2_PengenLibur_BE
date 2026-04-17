@@ -10,11 +10,11 @@ func (node *Node) dfsSearch(selector string) []*Node {
 	}
 
 	// insert node ke hasil sesuai filter
-	if node.includeNode(selector) {
+	if includeNode(node, selector) {
 		result = append(result, node)
 	}
 
-	if node.hasChildren() {
+	if hasChildren(node) {
 		// explore hingga paling dalam, baru pindah ke cabang selanjutnya
 		for _, child := range node.Children {
 			if child != nil {
