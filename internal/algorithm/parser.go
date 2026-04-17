@@ -1,7 +1,6 @@
-package parser
+package algorithm
 
 import (
-	"backend/src/algorithm"
 	"bytes"
 	"fmt"
 	"io"
@@ -16,16 +15,16 @@ import (
 
 // https://pkg.go.dev/golang.org/x/net/html
 
-func TokenToNode(token *net_html.Token) *algorithm.Node {
+func TokenToNode(token *net_html.Token) *Node {
 	isText := false
-	attributes := []algorithm.Attribute{}
+	attributes := []Attribute{}
 	if token.Type == net_html.TextToken {
 		isText = false
 	}
 
 	if !isText {
 		for i := 0; i < (len(token.Attr)); i++ {
-			attributes = append(attributes, algorithm.Attribute{
+			attributes = append(attributes, Attribute{
 				Name:  token.Attr[i].Key,
 				Value: token.Attr[i].Val,
 			})
@@ -33,28 +32,28 @@ func TokenToNode(token *net_html.Token) *algorithm.Node {
 		}
 	}
 
-	newElmt := algorithm.Element{
+	newElmt := Element{
 		Data:       token.Data,
 		IsText:     isText,
 		Attributes: attributes,
 	}
 
-	return algorithm.NewNode(newElmt)
+	return NewNode(newElmt)
 }
 
-func Parse(src []byte) (*algorithm.Node, error) {
+func Parse(src []byte) (*Node, error) {
 	source := bytes.NewReader(src)
 	tokenizer := net_html.NewTokenizer(source)
 
 	// Iterate through each token
 
-	var currentParent *algorithm.Node = nil
+	var currentParent *Node = nil
 	fmt.Println("Here!")
 	for {
 		tok := tokenizer.Next()
 		token := tokenizer.Token()
 
-		var currentNode *algorithm.Node = nil
+		var currentNode *Node = nil
 
 		switch tok {
 		case net_html.ErrorToken: // aman
