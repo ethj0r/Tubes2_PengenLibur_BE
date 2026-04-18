@@ -1,13 +1,11 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"backend/internal/app"
+
+	_ "backend/docs"
+)
 
 func main() {
-	router := gin.Default()
-
-	router.GET("/", func(c *gin.Context) {
-		c.String(200, "Hello, World!")
-	})
-
-	router.Run(":8080")
+	app.Run()
 }
