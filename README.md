@@ -15,3 +15,6 @@ notes :
 
 how to run :
 jalankan `make` di
+
+how to update the docs:
+`swag init-g cmd/api/main.go` untuk updat terus documentationnya
