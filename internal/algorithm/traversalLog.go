@@ -101,11 +101,12 @@ func bfsSearchReport(root *Node, selector string, topN int) TraversalReport {
 
 		if matched {
 			report.Matches = append(report.Matches, curr.node)
-			if topN > 0 && len(report.Matches) >= topN { //				break
+			if topN > 0 && len(report.Matches) >= topN {
+				break
 			}
 		}
 
-		// simpan depth traversal terjauh 
+		// simpan depth traversal terjauh
 		if curr.depth > report.TraversalMaxDepth {
 			report.TraversalMaxDepth = curr.depth
 		}
@@ -132,7 +133,7 @@ func dfsSearchReport(root *Node, selector string, topN int) TraversalReport {
 
 	start := time.Now()
 	step := 0
-	
+
 	dfsSearchReportVisit(root, selector, topN, &report, &step, 0)
 	report.TreeMaxDepth = getMaxDepth(root)
 	report.TimeTaken = time.Since(start).Milliseconds()
