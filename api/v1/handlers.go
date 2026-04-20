@@ -2,6 +2,7 @@ package v1
 
 import (
 	"backend/internal/app/health"
+	"backend/internal/app/traverse"
 
 	"github.com/gin-gonic/gin"
 
@@ -10,17 +11,16 @@ import (
 )
 
 type Handlers struct {
-	DocsHandler   gin.HandlerFunc
-	HealthHandler *health.Handler
+	DocsHandler     gin.HandlerFunc
+	HealthHandler   *health.Handler
+	TraverseHandler *traverse.Handler
 }
 
 func InitHandlers() *Handlers {
-	// swagger initialization
 	docsHandler := ginSwagger.WrapHandler(swaggerFiles.Handler)
-
-	healthHandler := health.NewHandler()
 	return &Handlers{
-		DocsHandler:   docsHandler,
-		HealthHandler: healthHandler,
+		DocsHandler:     docsHandler,
+		HealthHandler:   health.NewHandler(),
+		TraverseHandler: traverse.NewHandler(),
 	}
 }
