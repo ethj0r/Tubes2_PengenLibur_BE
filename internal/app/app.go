@@ -17,14 +17,14 @@ func Run() {
 	}
 
 	corsConfig := cors.DefaultConfig()
-	origin, ok := os.LookupEnv("CORS_ALLOWED_ORIGIN")
-	if !ok {
-		origin = "http://localhost:3000"
+	if origin, ok := os.LookupEnv("CORS_ALLOWED_ORIGIN"); ok {
+		corsConfig.AllowOrigins = []string{origin}
+	} else {
+		corsConfig.AllowOrigins = []string{"http://localhost:3000", "http://localhost:3001"}
 	}
-
-	corsConfig.AllowOrigins = []string{origin}
 	corsConfig.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	r.Use(cors.New(corsConfig))
 
 	handlers := v1.InitHandlers()
 
