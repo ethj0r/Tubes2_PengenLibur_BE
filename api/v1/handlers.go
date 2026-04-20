@@ -2,6 +2,7 @@ package v1
 
 import (
 	"backend/internal/app/health"
+	"backend/internal/app/lca"
 	"backend/internal/app/traverse"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ type Handlers struct {
 	DocsHandler     gin.HandlerFunc
 	HealthHandler   *health.Handler
 	TraverseHandler *traverse.Handler
+	LCAHandler      *lca.Handler
 }
 
 func InitHandlers() *Handlers {
@@ -22,5 +24,6 @@ func InitHandlers() *Handlers {
 		DocsHandler:     docsHandler,
 		HealthHandler:   health.NewHandler(),
 		TraverseHandler: traverse.NewHandler(),
+		LCAHandler:      lca.NewHandler(),
 	}
 }

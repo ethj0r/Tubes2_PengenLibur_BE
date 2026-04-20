@@ -9,5 +9,6 @@ func RegisterRoutes(r *gin.Engine, handlers *Handlers) {
 	api := r.Group("/api/v1")
 	{
 		api.POST("/traverse", handlers.TraverseHandler.Traverse)
+		api.POST("/lca", handlers.LCAHandler.Compute)
 	}
 }
