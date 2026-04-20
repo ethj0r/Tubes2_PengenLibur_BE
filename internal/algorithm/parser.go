@@ -2,7 +2,6 @@ package algorithm
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"strings"
 
@@ -11,24 +10,27 @@ import (
 
 // curr relevant
 // https://brightdata.com/blog/web-data/parse-html-with-golang
-// Yang dipanggil untuk ngelakuin full
-
 // https://pkg.go.dev/golang.org/x/net/html
 
-func TokenToNode(token *net_html.Token) *Node {
-	isText := false
-	attributes := []Attribute{}
-	if token.Type == net_html.TextToken {
-		isText = false
-	}
+// Void elmts tokenizer emits StartTagToken, tapi secara spec
+// HTML5 mereka nggak punya closing tag. so hrus handle sebagai self-closing
+// supaya hierarchy tree nggak bocor.
+// ref: https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+var voidElements = map[string]bool{
+	"area": true, "base": true, "br": true, "col": true, "embed": true,
+	"hr": true, "img": true, "input": true, "link": true, "meta": true,
+	"param": true, "source": true, "track": true, "wbr": true,
+}
 
+func TokenToNode(token *net_html.Token) *Node {
+	isText := token.Type == net_html.TextToken
+	attributes := []Attribute{}
 	if !isText {
-		for i := 0; i < (len(token.Attr)); i++ {
+		for i := 0; i < len(token.Attr); i++ {
 			attributes = append(attributes, Attribute{
 				Name:  token.Attr[i].Key,
 				Value: token.Attr[i].Val,
 			})
-
 		}
 	}
 
@@ -45,50 +47,49 @@ func Parse(src []byte) (*Node, error) {
 	source := bytes.NewReader(src)
 	tokenizer := net_html.NewTokenizer(source)
 
-	// Iterate through each token
-
+	var root *Node = nil
 	var currentParent *Node = nil
-	fmt.Println("Here!")
+
 	for {
 		tok := tokenizer.Next()
 		token := tokenizer.Token()
 
-		var currentNode *Node = nil
-
 		switch tok {
-		case net_html.ErrorToken: // aman
+		case net_html.ErrorToken:
 			if tokenizer.Err() == io.EOF {
+				if root != nil {
+					return root, nil
+				}
 				return currentParent, nil
 			}
 			return nil, tokenizer.Err()
-		case net_html.TextToken: // aman
-			// Proses Text
+		case net_html.TextToken:
 			if strings.TrimSpace(token.Data) == "" {
 				continue
 			}
-			// add ke parent
 			if currentParent != nil {
 				currentParent.AddChild(TokenToNode(&token))
 			}
 		case net_html.SelfClosingTagToken:
-			// add ke parent
+			node := TokenToNode(&token)
 			if currentParent != nil {
-				currentParent.AddChild(TokenToNode(&token))
+				currentParent.AddChild(node)
+			} else if root == nil {
+				root = node
 			}
 		case net_html.StartTagToken:
-			// kasus khusus kalo <meta> ni somehow di-classify jadi start :/
-
-			// buat node
-			currentNode = TokenToNode(&token)
+			node := TokenToNode(&token)
 			if currentParent != nil {
-				currentParent.AddChild(currentNode)
+				currentParent.AddChild(node)
+			} else if root == nil {
+				root = node
 			}
-			// pindah ke dalam bagian si child yang baru
-			if token.Data != "meta" {
-				currentParent = currentNode
+			if !voidElements[token.Data] {
+				currentParent = node
+			} else if currentParent == nil {
+				currentParent = node
 			}
 		case net_html.EndTagToken:
-			// balik naik ke atas
 			if currentParent != nil && currentParent.Parent != nil {
 				currentParent = currentParent.Parent
 			}
