@@ -22,7 +22,11 @@ type TraversalReport struct {
 	VisitedNodeCount  int
 	TraversalMaxDepth int
 	TreeMaxDepth      int
-	TimeTaken         int64 // dalam miliseconds (ms)
+	TimeTaken         float64 // dalam milliseconds (ms)
+}
+
+func elapsedMs(start time.Time) float64 {
+	return float64(time.Since(start).Microseconds()) / 1000
 }
 
 // mengembalikan depth node dari root (root depth = 0)
@@ -65,7 +69,7 @@ func maxDepthFrom(node *Node, currentDepth int) int {
 	return maxDepth
 }
 
-//public wrappers
+// public wrappers
 func BFSSearchReport(root *Node, selector string, topN int) TraversalReport {
 	return bfsSearchReportParallel(root, selector, topN, runtime.NumCPU())
 }
@@ -133,7 +137,7 @@ func bfsSearchReport(root *Node, selector string, topN int) TraversalReport {
 	}
 
 	report.TreeMaxDepth = getMaxDepth(root)
-	report.TimeTaken = time.Since(start).Milliseconds()
+	report.TimeTaken = elapsedMs(start)
 	return report
 }
 
@@ -218,7 +222,7 @@ func bfsSearchReportParallel(root *Node, selector string, topN int, maxProcess i
 	}
 
 	report.TreeMaxDepth = getMaxDepth(root)
-	report.TimeTaken = time.Since(start).Milliseconds()
+	report.TimeTaken = elapsedMs(start)
 	return report
 }
 
@@ -234,7 +238,7 @@ func dfsSearchReport(root *Node, selector string, topN int) TraversalReport {
 
 	dfsSearchReportVisit(root, selector, topN, &report, &step, 0)
 	report.TreeMaxDepth = getMaxDepth(root)
-	report.TimeTaken = time.Since(start).Milliseconds()
+	report.TimeTaken = elapsedMs(start)
 	return report
 }
 
@@ -322,7 +326,7 @@ func dfsSearchReportParallel(root *Node, selector string, topN int, maxProcess i
 	}
 
 	report.TreeMaxDepth = getMaxDepth(root)
-	report.TimeTaken = time.Since(start).Milliseconds()
+	report.TimeTaken = elapsedMs(start)
 	return report
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"backend/internal/algorithm"
 	"backend/internal/scraper"
@@ -41,10 +42,10 @@ type LogEntryDTO struct {
 }
 
 type StatsDTO struct {
-	TimeTakenMs       int64 `json:"timeTakenMs"`
-	VisitedNodeCount  int   `json:"visitedNodeCount"`
-	TraversalMaxDepth int   `json:"traversalMaxDepth"`
-	TreeMaxDepth      int   `json:"treeMaxDepth"`
+	TimeTakenMs       float64 `json:"timeTakenMs"`
+	VisitedNodeCount  int     `json:"visitedNodeCount"`
+	TraversalMaxDepth int     `json:"traversalMaxDepth"`
+	TreeMaxDepth      int     `json:"treeMaxDepth"`
 }
 
 type Response struct {
@@ -60,6 +61,8 @@ type Handler struct{}
 func NewHandler() *Handler { return &Handler{} }
 
 func (h *Handler) Traverse(c *gin.Context) {
+	requestStart := time.Now()
+
 	var req Request
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -126,13 +129,15 @@ func (h *Handler) Traverse(c *gin.Context) {
 		}
 	}
 
+	totalTimeMs := float64(time.Since(requestStart).Microseconds()) / 1000
+
 	c.JSON(http.StatusOK, Response{
 		Tree:         tree,
 		Log:          logDTO,
 		Matches:      matches,
 		VisitedOrder: visited,
 		Stats: StatsDTO{
-			TimeTakenMs:       report.TimeTaken,
+			TimeTakenMs:       totalTimeMs,
 			VisitedNodeCount:  report.VisitedNodeCount,
 			TraversalMaxDepth: report.TraversalMaxDepth,
 			TreeMaxDepth:      report.TreeMaxDepth,
