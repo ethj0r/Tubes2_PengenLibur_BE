@@ -82,7 +82,17 @@ func (h *Handler) Traverse(c *gin.Context) {
 		}
 		htmlBytes = body
 	} else {
-		htmlBytes = []byte(req.Input)
+		trimmed := strings.TrimSpace(req.Input)
+		if trimmed == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "html input is empty"})
+			return
+		}
+
+		htmlBytes = []byte(trimmed)
+		if err := algorithm.ValidateHTML(htmlBytes); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid html structure: %v", err)})
+			return
+		}
 	}
 
 	root, err := algorithm.Parse(htmlBytes)
@@ -130,18 +140,22 @@ func (h *Handler) Traverse(c *gin.Context) {
 	}
 
 	totalTimeMs := float64(time.Since(requestStart).Microseconds()) / 1000
+	stats := StatsDTO{
+		TimeTakenMs:       totalTimeMs,
+		VisitedNodeCount:  report.VisitedNodeCount,
+		TraversalMaxDepth: report.TraversalMaxDepth,
+		TreeMaxDepth:      report.TreeMaxDepth,
+	}
+
+	// Save log to folder
+	_ = saveTraversalLog(req, stats, logDTO, matches, visited)
 
 	c.JSON(http.StatusOK, Response{
 		Tree:         tree,
 		Log:          logDTO,
 		Matches:      matches,
 		VisitedOrder: visited,
-		Stats: StatsDTO{
-			TimeTakenMs:       totalTimeMs,
-			VisitedNodeCount:  report.VisitedNodeCount,
-			TraversalMaxDepth: report.TraversalMaxDepth,
-			TreeMaxDepth:      report.TreeMaxDepth,
-		},
+		Stats:        stats,
 	})
 }
 

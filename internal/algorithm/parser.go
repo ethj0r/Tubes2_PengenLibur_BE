@@ -2,6 +2,7 @@ package algorithm
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strings"
 
@@ -95,6 +96,45 @@ func Parse(src []byte) (*Node, error) {
 			}
 		default:
 			continue
+		}
+	}
+}
+
+// Check Struktur HTML (apakah valid atau tidak)
+func ValidateHTML(src []byte) error {
+	tokenizer := net_html.NewTokenizer(bytes.NewReader(src))
+	stack := make([]string, 0, 32)
+
+	for {
+		tok := tokenizer.Next()
+		token := tokenizer.Token()
+
+		switch tok {
+		case net_html.ErrorToken:
+			if tokenizer.Err() == io.EOF {
+				if len(stack) > 0 {
+					return fmt.Errorf("unclosed tag <%s>", stack[len(stack)-1])
+				}
+				return nil
+			}
+			return tokenizer.Err()
+
+		case net_html.StartTagToken:
+			if !voidElements[token.Data] {
+				stack = append(stack, token.Data)
+			}
+
+		case net_html.EndTagToken:
+			if len(stack) == 0 {
+				return fmt.Errorf("unexpected closing tag </%s>", token.Data)
+			}
+
+			top := stack[len(stack)-1]
+			if token.Data != top {
+				return fmt.Errorf("mismatched closing tag </%s>, expected </%s>", token.Data, top)
+			}
+
+			stack = stack[:len(stack)-1]
 		}
 	}
 }
