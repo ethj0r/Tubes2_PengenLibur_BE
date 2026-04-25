@@ -69,12 +69,6 @@ go run ./cmd/api
 http://localhost:8080
 ```
 
-Catatan konfigurasi:
-
-- Port default: `8080` (bisa diubah via environment variable `PORT`)
-- Origin frontend default yang diizinkan CORS: `http://localhost:3000` dan `http://localhost:3001`
-- Bisa override origin CORS dengan environment variable `CORS_ALLOWED_ORIGIN`
-
 ### Opsi Kedua (Docker)
 
 Build image backend:
