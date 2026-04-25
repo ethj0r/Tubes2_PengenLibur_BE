@@ -113,7 +113,7 @@ func (h *Handler) Traverse(c *gin.Context) {
 	}
 
 	idByNode := map[*algorithm.Node]string{}
-	tree := serializeTree(root, idByNode)
+	tree := serializeTree(root, idByNode, req.Algorithm)
 
 	logDTO := make([]LogEntryDTO, 0, len(report.Log))
 	for _, entry := range report.Log {
@@ -159,16 +159,14 @@ func (h *Handler) Traverse(c *gin.Context) {
 	})
 }
 
-func serializeTree(root *algorithm.Node, idByNode map[*algorithm.Node]string) *NodeDTO {
-	counter := 0
-	var walk func(n *algorithm.Node) *NodeDTO
-	walk = func(n *algorithm.Node) *NodeDTO {
+func serializeTree(root *algorithm.Node, idByNode map[*algorithm.Node]string, traversalMode string) *NodeDTO {
+	assignNodeIDs(root, idByNode, traversalMode)
+
+	var build func(n *algorithm.Node) *NodeDTO
+	build = func(n *algorithm.Node) *NodeDTO {
 		if n == nil {
 			return nil
 		}
-		id := fmt.Sprintf("n%d", counter)
-		counter++
-		idByNode[n] = id
 
 		attrs := make([]AttributeDTO, 0, len(n.Elmt.Attributes))
 		for _, a := range n.Elmt.Attributes {
@@ -176,7 +174,7 @@ func serializeTree(root *algorithm.Node, idByNode map[*algorithm.Node]string) *N
 		}
 
 		dto := &NodeDTO{
-			ID:         id,
+			ID:         idByNode[n],
 			Tag:        n.Elmt.Data,
 			IsText:     n.Elmt.IsText,
 			Attributes: attrs,
@@ -186,11 +184,58 @@ func serializeTree(root *algorithm.Node, idByNode map[*algorithm.Node]string) *N
 			dto.Text = n.Elmt.Data
 		}
 		for _, child := range n.Children {
-			if c := walk(child); c != nil {
+			if c := build(child); c != nil {
 				dto.Children = append(dto.Children, c)
 			}
 		}
 		return dto
 	}
-	return walk(root)
+
+	return build(root)
+}
+
+func assignNodeIDs(root *algorithm.Node, idByNode map[*algorithm.Node]string, traversalMode string) {
+	if root == nil {
+		return
+	}
+
+	counter := 0
+	nextID := func() string {
+		id := fmt.Sprintf("n%d", counter)
+		counter++
+		return id
+	}
+
+	if traversalMode == "bfs" {
+		queue := []*algorithm.Node{root}
+		for len(queue) > 0 {
+			curr := queue[0]
+			queue = queue[1:]
+			if curr == nil {
+				continue
+			}
+
+			idByNode[curr] = nextID()
+			for _, child := range curr.Children {
+				if child != nil {
+					queue = append(queue, child)
+				}
+			}
+		}
+		return
+	}
+
+	var walk func(n *algorithm.Node)
+	walk = func(n *algorithm.Node) {
+		if n == nil {
+			return
+		}
+
+		idByNode[n] = nextID()
+		for _, child := range n.Children {
+			walk(child)
+		}
+	}
+
+	walk(root)
 }
