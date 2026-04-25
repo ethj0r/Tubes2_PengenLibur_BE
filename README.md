@@ -71,21 +71,10 @@ http://localhost:8080
 
 ### Opsi Kedua (Docker)
 
-Build image backend:
+Jalankan aplikasi dengan Docker Compose.
 
 ```bash
-docker build -t pengenlibur-be .
-```
-
-Jalankan container:
-
-```bash
-docker run --rm -p 8080:8080 --name pengenlibur-be pengenlibur-be
-```
-Contoh dengan custom port:
-
-```bash
-docker run --rm -p 9000:9000 -e PORT=9000 --name pengenlibur-be pengenlibur-be
+docker compose up --build
 ```
 ## Kontributor
 
